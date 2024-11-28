@@ -26,32 +26,22 @@ public class MediatorTituloDivida {
 
     // Método privado para validar o TituloDivida
     private String validar(TituloDivida titulo) {
-        // (1) Validar identificador
         if (titulo.getIdentificador() <= 0 || titulo.getIdentificador() >= 100000) {
             return "Identificador deve estar entre 1 e 99999.";
         }
-        // (2) Validar nome
-        String nome = titulo.getNome();
-        if (nome == null || nome.trim().isEmpty()) {
+        if (titulo.getNome() == null || titulo.getNome().isBlank()) {
             return "Nome deve ser preenchido.";
         }
-        // (3) Verificar o comprimento do nome
-        if (nome.length() < 10 || nome.length() > 100) {
+        if (titulo.getNome().length() < 10 || titulo.getNome().length() > 100) {
             return "Nome deve ter entre 10 e 100 caracteres.";
         }
-        // (4) Validar data de validade
-        LocalDate dataValidade = titulo.getDataValidade();
-        LocalDate dataMinima = LocalDate.now().plusDays(180);
-        if (dataValidade.isBefore(dataMinima)) {
-            return "Data de validade deve ter pelo menos 180 dias à frente da data atual.";
+        if (titulo.getDataDeValidade().isBefore(LocalDate.now().plusDays(180))) {
+            return "Data de validade deve ter pelo menos 180 dias na frente da data atual.";
         }
-        // (5) Validar valor unitário
-        if (titulo.getValorUnitario() <= 0) {
-            return "Valor unitário deve ser maior que zero.";
+        if (titulo.getTaxaJuros() < 0) {
+            return "Taxa de juros deve ser maior ou igual a zero.";
         }
-
-        // Se todas as validações forem válidas, retornar null
-        return null;
+        return null; // Objeto válido
     }
 
     // Método para incluir o título

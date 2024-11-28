@@ -1,4 +1,9 @@
-package br.com.cesarschool.poo.titulos.utils;
+package br.com.cesarschool.poo.titulos.Relatorios;
+
+import br.com.cesarschool.poo.titulos.entidades.Transacao;
+import br.com.cesarschool.poo.titulos.repositorios.RepositorioTransacao;
+import br.com.cesarschool.poo.titulos.utils.ComparadorTransacaoPorNomeCredora;
+import br.com.cesarschool.poo.titulos.utils.Ordenador;
 
 public class RelatorioTransacaoBroker {
     private RepositorioTransacao repositorio;

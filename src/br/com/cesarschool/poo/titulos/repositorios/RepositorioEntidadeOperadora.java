@@ -1,27 +1,39 @@
 package br.com.cesarschool.poo.titulos.repositorios;
 
-import br.com.cesarschool.poo.titulos.entidades.Acao;
+import br.com.cesarschool.poo.titulos.entidades.EntidadeOperadora;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositorioEntidadeOperadora {
+public class RepositorioEntidadeOperadora extends RepositorioGeral<EntidadeOperadora>{
 
-    private static final String FILE_NAME = "Acao.txt";
+    private static final String FILE_NAME = "EntidadeOperadora.txt"; // Arquivo de dados de EntidadeOperadora
 
-    // Método para incluir uma nova ação no arquivo
-    public boolean incluir(Acao acao) {
-        List<Acao> acoes = lerAcoes();
-        // Verifica se o identificador já existe
-        for (Acao a : acoes) {
-            if (a.getIdentificador() == acao.getIdentificador()) {
-                return false; // Não pode incluir identificador repetido
+    @Override
+    public Class<EntidadeOperadora> getClasseEntidade() {
+        return EntidadeOperadora.class;
+    }
+
+    @Override
+    public EntidadeOperadora buscar(int idUnico) {
+        return buscar((long) idUnico);  // Converte para long e chama o método genérico
+    }
+
+    @Override
+    public boolean excluir(int id) {
+        return excluir((long) id);  // Converte para long e chama o método genérico
+    }
+
+    public boolean incluir(EntidadeOperadora entidade) {
+        List<EntidadeOperadora> entidades = lerEntidades();
+        for (EntidadeOperadora e : entidades) {
+            if (e.getIdentificador() == entidade.getIdentificador()) {
+                return false; // Identificador já existe
             }
         }
-        // Adiciona nova linha ao arquivo
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(acao.getIdentificador() + ";" + acao.getNome() + ";" + acao.getDataValidade() + ";" + acao.getValorUnitario());
+            writer.write(entidade.getIdentificador() + ";" + entidade.getNome() + ";" + entidade.getAutorizadoAcao() + ";" + entidade.getSaldoAcao() + ";" + entidade.getSaldoTituloDivida());
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -30,85 +42,77 @@ public class RepositorioEntidadeOperadora {
         return true;
     }
 
-    // Método para alterar uma ação existente
-    public boolean alterar(Acao acao) {
-        List<Acao> acoes = lerAcoes();
+    public boolean alterar(EntidadeOperadora entidade) {
+        List<EntidadeOperadora> entidades = lerEntidades();
         boolean encontrado = false;
 
-        // Procura o identificador e substitui a linha
-        for (int i = 0; i < acoes.size(); i++) {
-            if (acoes.get(i).getIdentificador() == acao.getIdentificador()) {
-                acoes.set(i, acao);
+        for (int i = 0; i < entidades.size(); i++) {
+            if (entidades.get(i).getIdentificador() == entidade.getIdentificador()) {
+                entidades.set(i, entidade); // Substitui a linha
                 encontrado = true;
                 break;
             }
         }
 
         if (!encontrado) {
-            return false; // Identificador não encontrado
+            return false;
         }
 
-        return escreverAcoes(acoes); // Atualiza o arquivo
+        return escreverEntidades(entidades);
     }
 
-    // Método para excluir uma ação existente
-    public boolean excluir(int identificador) {
-        List<Acao> acoes = lerAcoes();
+    public boolean excluir(long identificador) {
+        List<EntidadeOperadora> entidades = lerEntidades();
         boolean encontrado = false;
 
-        // Procura o identificador e remove a ação
-        for (int i = 0; i < acoes.size(); i++) {
-            if (acoes.get(i).getIdentificador() == identificador) {
-                acoes.remove(i);
+        for (int i = 0; i < entidades.size(); i++) {
+            if (entidades.get(i).getIdentificador() == identificador) {
+                entidades.remove(i); // Remove a linha
                 encontrado = true;
                 break;
             }
         }
 
         if (!encontrado) {
-            return false; // Identificador não encontrado
+            return false;
         }
 
-        return escreverAcoes(acoes); // Atualiza o arquivo
+        return escreverEntidades(entidades);
     }
 
-    // Método para buscar uma ação pelo identificador
-    public Acao buscar(int identificador) {
-        List<Acao> acoes = lerAcoes();
-        for (Acao a : acoes) {
-            if (a.getIdentificador() == identificador) {
-                return a; // Retorna a ação correspondente
+    public EntidadeOperadora buscar(long identificador) {
+        List<EntidadeOperadora> entidades = lerEntidades();
+        for (EntidadeOperadora e : entidades) {
+            if (e.getIdentificador() == identificador) {
+                return e; // Retorna o objeto encontrado
             }
         }
-        return null; // Identificador não encontrado
+        return null; // Não encontrado
     }
 
-    // Método auxiliar para ler todas as ações do arquivo
-    private List<Acao> lerAcoes() {
-        List<Acao> acoes = new ArrayList<>();
+    private List<EntidadeOperadora> lerEntidades() {
+        List<EntidadeOperadora> entidades = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String linha;
-            // Lê cada linha e converte em objeto Acao
             while ((linha = reader.readLine()) != null) {
                 String[] campos = linha.split(";");
-                int identificador = Integer.parseInt(campos[0]);
+                long identificador = Long.parseLong(campos[0]);
                 String nome = campos[1];
-                String dataValidade = campos[2];
-                double valorUnitario = Double.parseDouble(campos[3]);
-                acoes.add(new Acao(identificador, nome, dataValidade, valorUnitario));
+                double autorizadoAcao = Double.parseDouble(campos[2]);
+                double saldoAcao = Double.parseDouble(campos[3]);
+                double saldoTituloDivida = Double.parseDouble(campos[4]);
+                entidades.add(new EntidadeOperadora(identificador, nome, autorizadoAcao));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return acoes;
+        return entidades;
     }
 
-    // Método auxiliar para escrever todas as ações no arquivo
-    private boolean escreverAcoes(List<Acao> acoes) {
+    private boolean escreverEntidades(List<EntidadeOperadora> entidades) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            // Escreve cada ação no arquivo
-            for (Acao acao : acoes) {
-                writer.write(acao.getIdentificador() + ";" + acao.getNome() + ";" + acao.getDataValidade() + ";" + acao.getValorUnitario());
+            for (EntidadeOperadora entidade : entidades) {
+                writer.write(entidade.getIdentificador() + ";" + entidade.getNome() + ";" + entidade.getAutorizadoAcao() + ";" + entidade.getSaldoAcao() + ";" + entidade.getSaldoTituloDivida());
                 writer.newLine();
             }
         } catch (IOException e) {

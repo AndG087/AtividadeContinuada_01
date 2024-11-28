@@ -1,0 +1,3 @@
+1;A1;2024-11-27;100.0;Credor Padrão
+2;A2;2024-11-27;101.0;Credor Padrão
+3;A3Alt;2024-11-17;103.0;Credor Padrão

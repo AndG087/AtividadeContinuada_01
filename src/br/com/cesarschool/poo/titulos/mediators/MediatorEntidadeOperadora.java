@@ -1,17 +1,17 @@
 package br.com.cesarschool.poo.titulos.mediators;
 
-import java.time.LocalDate;
 import br.com.cesarschool.poo.titulos.entidades.EntidadeOperadora;
 import br.com.cesarschool.poo.titulos.repositorios.RepositorioEntidadeOperadora;
+import java.time.LocalDate;
 
 public class MediatorEntidadeOperadora {
     private static MediatorEntidadeOperadora instancia;
     private final RepositorioEntidadeOperadora repositorioEntidadeOperadora = new RepositorioEntidadeOperadora();
+    
+    private MediatorEntidadeOperadora() {
+    }
 
-    // Construtor privado para garantir o Singleton
-    private MediatorEntidadeOperadora() {}
-
-    public static MediatorEntidadeOperadora getInstancia() {
+    public static synchronized MediatorEntidadeOperadora getInstancia() {
         if (instancia == null) {
             instancia = new MediatorEntidadeOperadora();
         }
@@ -19,60 +19,84 @@ public class MediatorEntidadeOperadora {
     }
 
     private String validar(EntidadeOperadora entidade) {
-        if (entidade.getIdentificador() < 100 || entidade.getIdentificador() > 1000000) {
+        if (entidade.getIdentificador() <= 100 || entidade.getIdentificador() >= 1000000) {
             return "Identificador deve estar entre 100 e 1000000.";
         }
-        if (entidade.getNome() == null || entidade.getNome().trim().isEmpty()) {
+
+        String nome = entidade.getNome();
+        if (nome == null || nome.trim().isEmpty()) {
             return "Nome deve ser preenchido.";
         }
-        if (entidade.getNome().length() < 5 || entidade.getNome().length() > 60) {
-            return "Nome deve ter entre 5 e 60 caracteres.";
+
+        if (nome.length() < 10 || nome.length() > 100) {
+            return "Nome deve ter entre 10 e 100 caracteres.";
         }
-        if (entidade.getDataValidade().isBefore(LocalDate.now().plusDays(180))) {
-            return "Data de validade deve ter pelo menos 180 dias à frente da data atual.";
+
+        /*LocalDate dataAtualMais180 = LocalDate.now().plusDays(180);
+        if (entidade.getDataDeValidade().isBefore(dataAtualMais180)) {
+            return "Data de validade deve ser superior a 180 dias a partir da data atual.";
         }
+
         if (entidade.getValorUnitario() <= 0) {
             return "Valor unitário deve ser maior que zero.";
-        }
-        return null; // Objeto é válido
+        }*/
+
+        return null;
     }
 
     public String incluir(EntidadeOperadora entidade) {
-        String validacao = validar(entidade);
-        if (validacao != null) {
-            return validacao;
+        String mensagemValidacao = validar(entidade);
+
+        if (mensagemValidacao != null) {
+            return mensagemValidacao; // (2)
         }
-        if (repositorioEntidadeOperadora.incluir(entidade)) {
-            return null;
+
+        boolean incluida = repositorioEntidadeOperadora.incluir(entidade);
+
+        if (incluida) {
+            return null; // (1)
+        } else {
+            return "Entidade já existente"; // (3)
         }
-        return "Entidade já existente";
     }
 
     public String alterar(EntidadeOperadora entidade) {
-        String validacao = validar(entidade);
-        if (validacao != null) {
-            return validacao;
+        String mensagemValidacao = validar(entidade);
+
+        if (mensagemValidacao != null) {
+            return mensagemValidacao; // (2)
         }
-        if (repositorioEntidadeOperadora.alterar(entidade)) {
-            return null;
+
+        boolean alterada = repositorioEntidadeOperadora.alterar(entidade);
+
+        if (alterada) {
+            return null; // (1)
+        } else {
+            return "Entidade inexistente"; // (3)
         }
-        return "Entidade inexistente";
     }
 
+    // Metodo para excluir uma EntidadeOperadora por identificador
     public String excluir(int identificador) {
-        if (identificador < 100 || identificador > 1000000) {
-            return "Identificador deve estar entre 100 e 1000000.";
+        if (!validarIdentificador(identificador)) {
+            return "Entidade inexistente.";
         }
-        if (repositorioEntidadeOperadora.excluir(identificador)) {
-            return null;
-        }
-        return "Entidade inexistente";
+
+        boolean excluida = repositorioEntidadeOperadora.excluir(identificador);
+        return excluida ? null : "Entidade inexistente.";
     }
 
+    // Metodo para buscar uma EntidadeOperadora por identificador
     public EntidadeOperadora buscar(int identificador) {
-        if (identificador < 100 || identificador > 1000000) {
+        if (!validarIdentificador(identificador)) {
             return null;
         }
         return repositorioEntidadeOperadora.buscar(identificador);
     }
+
+    // Metodo para validar o identificador
+    private boolean validarIdentificador(long identificador) {
+        return identificador >= 100 && identificador <= 1000000;
+    }
+
 }

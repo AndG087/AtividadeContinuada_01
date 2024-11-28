@@ -2,6 +2,7 @@ package br.gov.cesarschool.poo.daogenerico;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Esta classe representa uma superclasse de todas as entidades.
@@ -14,6 +15,7 @@ public abstract class Entidade implements Serializable {
     private LocalDateTime dataHoraUltimaAlteracao;
     private String usuarioInclusao;
     private String usuarioUltimaAlteracao;
+    private String idUnico; // Novo campo para ID único
 
     // Construtor sem parâmetros
     public Entidade() {
@@ -21,9 +23,14 @@ public abstract class Entidade implements Serializable {
         this.dataHoraUltimaAlteracao = LocalDateTime.now();
         this.usuarioInclusao = "sistema";
         this.usuarioUltimaAlteracao = "sistema";
+        this.idUnico = UUID.randomUUID().toString(); // Gerando ID único
     }
 
-    // Getters e Setters
+    public Entidade(String valueOf) {
+		// TODO Auto-generated constructor stub
+	}
+
+	// Getters e Setters
     public LocalDateTime getDataHoraInclusao() {
         return dataHoraInclusao;
     }
@@ -56,6 +63,11 @@ public abstract class Entidade implements Serializable {
         this.usuarioUltimaAlteracao = usuarioUltimaAlteracao;
     }
 
-    // Método abstrato para obter o ID único da entidade
-    public abstract Object getIdUnico();
+    public String getIdUnico() {
+        return idUnico;
+    }
+
+    public void setIdUnico(String idUnico) {
+        this.idUnico = idUnico;
+    }	
 }

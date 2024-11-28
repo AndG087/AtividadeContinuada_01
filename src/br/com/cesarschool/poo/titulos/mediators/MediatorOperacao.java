@@ -1,7 +1,10 @@
 package br.com.cesarschool.poo.titulos.mediators;
 
 import java.time.LocalDateTime;
+
+import br.com.cesarschool.poo.titulos.entidades.Acao;
 import br.com.cesarschool.poo.titulos.entidades.EntidadeOperadora;
+import br.com.cesarschool.poo.titulos.entidades.TituloDivida;
 import br.com.cesarschool.poo.titulos.entidades.Transacao;
 import br.com.cesarschool.poo.titulos.repositorios.RepositorioTransacao;
 
@@ -61,11 +64,6 @@ public class MediatorOperacao {
             // 7. Validar o saldo de ações
             if (entidadeDebito.getSaldoAcao() < valor) {
                 return "Saldo da entidade débito insuficiente";
-            }
-
-            // 8. Validar o valor da operação com o valor unitário da ação
-            if (acao.getValorUnitario() > valor) {
-                return "Valor da operação é menor do que o valor unitário da ação";
             }
 
             // 9. Calcular o valor da operação (para ações, é o próprio valor)

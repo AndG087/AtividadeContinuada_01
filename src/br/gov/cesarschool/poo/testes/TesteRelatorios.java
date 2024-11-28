@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import br.com.cesarschool.poo.titulos.entidades.Acao;
 import br.com.cesarschool.poo.titulos.entidades.EntidadeOperadora;
 import br.com.cesarschool.poo.titulos.entidades.Transacao;
-import br.com.cesarschool.poo.titulos.relatorios.RelatorioTransacaoBroker;
+import br.com.cesarschool.poo.titulos.Relatorios.RelatorioTransacaoBroker;
 import br.com.cesarschool.poo.titulos.repositorios.RepositorioTransacao;
 import br.com.cesarschool.poo.titulos.utils.Comparador;
 import br.com.cesarschool.poo.titulos.utils.ComparadorPadrao;

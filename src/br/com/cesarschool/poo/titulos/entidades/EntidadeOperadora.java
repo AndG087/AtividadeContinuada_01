@@ -1,8 +1,16 @@
 package br.com.cesarschool.poo.titulos.entidades;
 
-public class EntidadeOperadora {
+import java.time.LocalDate;
 
-    private final long identificador; 
+import br.gov.cesarschool.poo.daogenerico.Entidade;
+
+public class EntidadeOperadora extends Entidade{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private final long identificador; 
     private String nome;
     private double autorizadoAcao;
     private double saldoAcao;
@@ -15,6 +23,10 @@ public class EntidadeOperadora {
         this.autorizadoAcao = autorizadoAcao;
         this.saldoAcao = 0.0;
         this.saldoTituloDivida = 0.0;
+    }
+    
+    public boolean isAutorizadaParaAcao() {
+        return autorizadoAcao > 0; 
     }
 
 
@@ -75,4 +87,19 @@ public class EntidadeOperadora {
             saldoTituloDivida -= valor;
         }
     }
+
+
+	public LocalDate getDataValidade() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getIdUnico() {
+		return String.valueOf(identificador);
+		
+	}
+
 }
+    
+    
+
