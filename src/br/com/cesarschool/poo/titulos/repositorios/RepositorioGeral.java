@@ -38,8 +38,9 @@ public abstract class RepositorioGeral<T extends Entidade> {
     public T buscar(String idUnico) {
         return (T) dao.buscar(idUnico);
     }
-
-    public T[] buscarTodos() {
+    
+    @SuppressWarnings("unchecked")
+	public T[] buscarTodos() {
         Entidade[] entidades = dao.buscarTodos();
         if (entidades == null) {
             System.out.println("Nenhuma entidade encontrada.");

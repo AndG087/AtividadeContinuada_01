@@ -53,18 +53,13 @@ public class Transacao extends Entidade implements Comparavel {
     // Implementação de comparação por dataHoraOperacao
     @Override
     public int comparar(Comparavel c) {
-        if (c == null) {
-            throw new IllegalArgumentException("O objeto comparado não pode ser nulo.");
+        if (c instanceof Transacao) {
+            Transacao outra = (Transacao) c;
+            return outra.dataHoraOperacao.compareTo(this.dataHoraOperacao);
         }
-        if (!(c instanceof Transacao)) {
-            throw new IllegalArgumentException("O objeto comparado não é uma Transacao.");
-        }
-
-        Transacao outra = (Transacao) c;
-        return this.dataHoraOperacao.compareTo(outra.getDataHoraOperacao());
+        throw new IllegalArgumentException("Comparação com tipo incompatível.");
     }
-
-    // Implementação de getIdUnico (ajuste para usar a nova versão de TituloDivida)
+    // Implementação de getIdUnico
     @Override
     public String getIdUnico() {
         // Verifica se o objeto acao é nulo antes de tentar acessá-lo

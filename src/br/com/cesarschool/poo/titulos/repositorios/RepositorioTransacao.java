@@ -1,30 +1,46 @@
 package br.com.cesarschool.poo.titulos.repositorios;
 
+import br.com.cesarschool.poo.titulos.entidades.EntidadeOperadora;
 import br.com.cesarschool.poo.titulos.entidades.Transacao;
 import java.util.Arrays;
 
 public class RepositorioTransacao extends RepositorioGeral<Transacao> {
 
-	private static final String FILE_NAME = "Transacao.txt";
+	private static final String FILE_NAME = "EntidadeOperadora.txt";
 
-	@Override
-	public Class<Transacao> getClasseEntidade() {
-		return Transacao.class;
+    @Override
+    public Class<Transacao> getClasseEntidade() {
+        return Transacao.class;
+    }
+
+    // Sobrecarga de método para buscar por identificador int
+    public Transacao buscar(int idUnico) {
+        return super.buscar(String.valueOf(idUnico)); // Converte int para String
+    }
+
+    // Sobrecarga de método para buscar por identificador long
+    public Transacao buscar(long idUnico) {
+        return super.buscar(String.valueOf(idUnico)); // Converte long para String
+    }
+
+    // Sobrecarga de método para excluir por identificador int
+    public boolean excluir(int idUnico) {
+        return super.excluir(String.valueOf(idUnico)); // Converte int para String
+    }
+
+    // Sobrecarga de método para excluir por identificador long
+    public boolean excluir(long idUnico) {
+        return super.excluir(String.valueOf(idUnico)); // Converte long para String
+    }
+    
+    public Transacao[] buscarPorEntidadeDevedora(long identificadorEntidadeDebito) {
+		// Busca transações filtrando pela entidade devedora
+		return Arrays.stream(buscarTodos())
+				.filter(transacao -> transacao.getEntidadeDebito().getIdentificador() == identificadorEntidadeDebito)
+				.toArray(Transacao[]::new);
 	}
-
-	@Override
-	public Transacao buscar(int idUnico) {
-		// Conversão do ID de int para String para garantir compatibilidade
-		return super.buscar(String.valueOf(idUnico));
-	}
-
-	@Override
-	public boolean excluir(int id) {
-		// Chamada ao método de exclusão da classe pai com conversão
-		return super.excluir(String.valueOf(id));
-	}
-
-	public Transacao[] buscarPorEntidadeCredora(long identificadorEntidadeCredito) {
+    
+    public Transacao[] buscarPorEntidadeCredora(long identificadorEntidadeCredito) {
 		Transacao[] todasTransacoes = buscarTodos();
 		System.out.println("Total de transações carregadas: " + todasTransacoes.length);
 		Transacao[] filtradas = Arrays.stream(todasTransacoes)
@@ -35,13 +51,5 @@ public class RepositorioTransacao extends RepositorioGeral<Transacao> {
 				.toArray(Transacao[]::new);
 		System.out.println("Total de transações filtradas: " + filtradas.length);
 		return filtradas;
-	}
-
-
-	public Transacao[] buscarPorEntidadeDevedora(long identificadorEntidadeDebito) {
-		// Busca transações filtrando pela entidade devedora
-		return Arrays.stream(buscarTodos())
-				.filter(transacao -> transacao.getEntidadeDebito().getIdentificador() == identificadorEntidadeDebito)
-				.toArray(Transacao[]::new);
 	}
 }

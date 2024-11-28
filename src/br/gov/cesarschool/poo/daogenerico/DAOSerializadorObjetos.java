@@ -4,28 +4,31 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Esta classe representa um DAO genérico que inclui, exclui, altera, busca por identificador
- * único e busca todos, qualquer objeto(s) cujo tipo é subtipo de Entidade.
- */
 public class DAOSerializadorObjetos {
 
-    private String nomeDiretorio;
+    private final String diretorio;
 
-    // Construtor que inicializa o nome do diretório com base no tipo da entidade
     public DAOSerializadorObjetos(Class<?> tipoEntidade) {
-        this.nomeDiretorio = "dados/" + tipoEntidade.getSimpleName();
-        File diretorio = new File(nomeDiretorio);
-        if (!diretorio.exists()) {
-            diretorio.mkdirs(); // Cria o diretório, caso não exista
+        this.diretorio = "./" + tipoEntidade.getSimpleName(); // Define o diretório
+        File dir = new File(diretorio);
+        if (!dir.exists()) {
+            dir.mkdirs(); // Cria o diretório caso não exista
         }
     }
 
-    // Método para incluir uma entidade
     public boolean incluir(Entidade entidade) {
-        String caminhoArquivo = nomeDiretorio + "/" + entidade.getIdUnico() + ".dat";
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(caminhoArquivo))) {
+        File arquivo = new File(diretorio, entidade.getIdUnico());
+        System.out.println("Tentando adicionar arquivo no método adicionar: " + arquivo.getAbsolutePath());
+
+        if (arquivo.exists()) {
+            System.out.println("Arquivo já presente: " + arquivo.getName());
+            return false; // Já existe um arquivo com o mesmo identificador
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(arquivo))) {
+            entidade.setDataHoraInclusao(java.time.LocalDateTime.now());
             oos.writeObject(entidade);
+            System.out.println("Arquivo gravado com sucesso: " + arquivo.getAbsolutePath());
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,49 +36,73 @@ public class DAOSerializadorObjetos {
         }
     }
 
-    // Método para alterar uma entidade
     public boolean alterar(Entidade entidade) {
-        String caminhoArquivo = nomeDiretorio + "/" + entidade.getIdUnico() + ".dat";
-        File arquivo = new File(caminhoArquivo);
-        if (arquivo.exists()) {
-            return incluir(entidade); // Sobrescreve o arquivo existente
+        File arquivo = new File(diretorio, entidade.getIdUnico());
+        if (!arquivo.exists()) {
+            System.out.println("Arquivo não encontrado para atualização: " + arquivo.getAbsolutePath());
+            return false;
         }
-        return false;
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(arquivo))) {
+            entidade.setDataHoraUltimaAlteracao(java.time.LocalDateTime.now());
+            oos.writeObject(entidade);
+            System.out.println("Arquivo atualizado com sucesso: " + arquivo.getAbsolutePath());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    // Método para excluir uma entidade pelo ID único
     public boolean excluir(String idUnico) {
-        String caminhoArquivo = nomeDiretorio + "/" + idUnico + ".dat";
-        File arquivo = new File(caminhoArquivo);
-        return arquivo.delete(); // Retorna true se o arquivo foi excluído
+        File arquivo = new File(diretorio, idUnico);
+
+        if (arquivo.exists() && arquivo.delete()) {
+            System.out.println("Arquivo deletado com sucesso: " + arquivo.getAbsolutePath());
+            return true;
+        } else {
+            System.out.println("Erro ao deletar o arquivo: " + arquivo.getAbsolutePath());
+            return false;
+        }
     }
 
-    // Método para buscar uma entidade pelo ID único
     public Entidade buscar(String idUnico) {
-        String caminhoArquivo = nomeDiretorio + "/" + idUnico + ".dat";
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(caminhoArquivo))) {
-            return (Entidade) ois.readObject();
+        File arquivo = new File(diretorio, idUnico);
+        System.out.println("Tentando buscar arquivo: " + arquivo.getAbsolutePath());
+
+        if (!arquivo.exists()) {
+            System.out.println("Arquivo não encontrado: " + arquivo.getAbsolutePath());
+            return null;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(arquivo))) {
+            Entidade entidade = (Entidade) ois.readObject();
+            System.out.println("Entidade deserializada com sucesso: " + entidade);
+            return entidade;
         } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Erro ao deserializar o arquivo: " + arquivo.getAbsolutePath());
             e.printStackTrace();
             return null;
         }
     }
 
-    // Método para buscar todas as entidades
     public Entidade[] buscarTodos() {
-        File diretorio = new File(nomeDiretorio);
-        File[] arquivos = diretorio.listFiles((dir, name) -> name.endsWith(".dat"));
+        List<Entidade> entidades = new ArrayList<>();
+        File pasta = new File(diretorio);
+
+        // Filtrar todos os arquivos no diretório
+        File[] arquivos = pasta.listFiles();
         if (arquivos != null) {
-            List<Entidade> entidades = new ArrayList<>();
             for (File arquivo : arquivos) {
                 try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(arquivo))) {
                     entidades.add((Entidade) ois.readObject());
                 } catch (IOException | ClassNotFoundException e) {
+                    System.err.println("Erro ao deserializar arquivo: " + arquivo.getAbsolutePath());
                     e.printStackTrace();
                 }
             }
-            return entidades.toArray(new Entidade[0]);
         }
-        return new Entidade[0];
+        System.out.println("Total de entidades carregadas: " + entidades.size());
+        return entidades.toArray(new Entidade[0]);
     }
 }
